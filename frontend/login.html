@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="fr">
+        <head>
+
+        <meta charset="utf-8">
+        <title>Authentification hybride</title>
+
+     
+        </head>
+
+        <body>
+                
+                <form id="loginForm" >
+                        <h1>Connectez-vous : </h1>
+                        <div>adresse email : </div>
+                        <input name="email" type="email"/>
+                        <div>mot de passe : </div>
+                        <input name="password" type="password"/>
+
+                        <button type="submit">Connexion</button>
+                                
+                </form>
+                <a href="index.html">S'inscrire</a>
+
+		<script>
+		  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+		    e.preventDefault();
+
+		    const email = document.querySelector("[name=email]").value;
+		    const password = document.querySelector("[name=password]").value;
+
+		    const resp = await fetch("http://localhost:3000/api/auth/login", {
+		      method: "POST",
+		      headers: { "Content-Type": "application/json" },
+		      body: JSON.stringify({ email, password }),
+		    });
+
+		    if (resp.ok) {
+		      const data = await resp.json();
+		      console.log("Connecté :", data);
+		      window.location.href = "dashboard.html";
+		    } else {
+		      console.error("Erreur login :", await resp.text());
+		      alert("Identifiants invalides");
+		    }
+		  });
+		</script>
+
+        </body>
+</html>
+
