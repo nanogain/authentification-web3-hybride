@@ -1,0 +1,121 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+#loginForm {
+    background: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+h1 {
+    color: #333;
+    margin-bottom: 30px;
+    font-size: 24px;
+    text-align: center;
+}
+
+div {
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border: 2px solid #e0e0e0;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+button {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin-top: 10px;
+}
+
+button:hover {
+    transform: translateY(-2px);
+}
+
+.web3-btn {
+    background: linear-gradient(135deg, #f6851b 0%, #e2761b 100%);
+    max-width: 400px;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.web3-btn:hover {
+    background: linear-gradient(135deg, #e2761b 0%, #d06315 100%);
+}
+
+a {
+    display: block;
+    text-align: center;
+    color: white;
+    text-decoration: none;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+#message {
+    max-width: 400px;
+    width: 100%;
+    padding: 12px;
+    border-radius: 5px;
+    margin-top: 10px;
+    text-align: center;
+    display: none;
+}
+
+#message.error {
+    display: block;
+    background: #ffe6e6;
+    color: #d00;
+    border: 2px solid #ffcccc;
+}
+
+#message.success {
+    display: block;
+    background: #e6ffe6;
+    color: #0a0;
+    border: 2px solid #ccffcc;
+}
