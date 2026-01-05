@@ -2,14 +2,14 @@
 <html lang="fr">
         <head>
 
-        <meta charset="utf-8">
-        <title>Authentification hybride</title>
-
-     
+            <meta charset="utf-8">
+            <title>Authentification hybride</title>
+            <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+            <link rel="stylesheet" href="login.css">
         </head>
 
         <body>
-                
+
                 <form id="loginForm" >
                         <h1>Connectez-vous : </h1>
                         <div>adresse email : </div>
@@ -18,34 +18,104 @@
                         <input name="password" type="password"/>
 
                         <button type="submit">Connexion</button>
-                                
+
                 </form>
+
+                <button class="web3-btn" onclick="web3Login()">
+                        Se connecter avec MetaMask
+                </button>
+
                 <a href="index.html">S'inscrire</a>
+                <div id="message"></div>
 
-		<script>
-		  document.getElementById("loginForm").addEventListener("submit", async (e) => {
-		    e.preventDefault();
+                <script>
+                  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+                    e.preventDefault();
 
-		    const email = document.querySelector("[name=email]").value;
-		    const password = document.querySelector("[name=password]").value;
+                    const email = document.querySelector("[name=email]").value;
+                    const password = document.querySelector("[name=password]").value;
 
-		    const resp = await fetch("http://localhost:3000/api/auth/login", {
-		      method: "POST",
-		      headers: { "Content-Type": "application/json" },
-		      body: JSON.stringify({ email, password }),
-		    });
+                    const resp = await fetch("http://localhost:3000/api/auth/login", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ email, password }),
+                    });
 
-		    if (resp.ok) {
-		      const data = await resp.json();
-		      console.log("Connecté :", data);
-		      window.location.href = "dashboard.html";
-		    } else {
-		      console.error("Erreur login :", await resp.text());
-		      alert("Identifiants invalides");
-		    }
-		  });
-		</script>
+                    if (resp.ok) {
+                      const data = await resp.json();
+                      console.log("Connecté :", data);
+                      localStorage.setItem("access_token", data.token);
+                      console.log("Token stocké :", data.token);
+                      window.location.href = "dashboard.html";
+                    } else {
+                      console.error("Erreur login :", await resp.text());
+                      alert("Identifiants invalides");
+                    }
+                  });
+
+
+                  async function web3Login() {
+                    try {
+                        if (!window.ethereum) {
+                            throw new Error("MetaMask non installed");
+                        }
+
+                        const ethereum = window.ethereum.providers
+                                ? window.ethereum.providers.find(p => p.isMetaMask)
+                                : window.ethereum;
+                        const provider = new ethers.providers.Web3Provider(ethereum);
+                        const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+                        if (!accounts.length) throw new Error("Compte MetaMask non autorisé");
+
+                        const address = accounts[0];
+                        const signer = provider.getSigner(address);
+
+                        console.log("ADDRESS =", address);
+
+
+                        const nonceRes = await fetch("http://localhost:3000/api/auth/web3/login", {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({
+                                    walletAddress: address,
+                                    getNonce: true
+                            })
+                        });
+                        const { nonce } = await nonceRes.json();
+                        console.log("NONCE RESPONSE =", nonce);
+
+
+                        const message = `Connexion avec nonce: ${nonce}`;
+                        const signature = await signer.signMessage(message);
+
+
+                        const loginRes = await fetch("http://localhost:3000/api/auth/web3/login", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ walletAddress: address, signature })
+                        });
+
+                        const data = await loginRes.json();
+                        if (!loginRes.ok) throw new Error(data.message);
+
+                        localStorage.setItem("access_token", data.token);
+                        localStorage.setItem("walletAddress", data.walletAddress);
+                        showMessage("Connexion réussie !", "success");
+                        window.location.href = "dashboard.html";
+
+                   } catch (err) {
+                        showMessage(err.message, "error");
+                   }
+                }
+
+                function showMessage(msg, type) {
+                     const div = document.getElementById("message");
+                    div.textContent = msg;
+                    div.className = type;
+                }
+                </script>
 
         </body>
 </html>
+
 
