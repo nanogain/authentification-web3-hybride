@@ -3,20 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <title>Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
 </head>
 <body>
 
-  <h1>Bienvenue sur votre Dashboard</h1>
+  <h1>Bienvenue sur votre Dashboard <span id="user-pseudo"></span></h1>
   <p>Vous êtes connecté !</p>
 
   <button id="logoutBtn">Déconnexion</button>
 
   <script>
     document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("walletAddress");
       window.location.href = "login.html";
     });
 
   </script>
 
+  <script>
+     async function loadUserProfile() {
+        const token = localStorage.getItem("access_token");
+
+        if (!token) {
+                window.location.href = "/login.html";
+                return;
+        }
+        const walletAddress = localStorage.getItem("walletAddress");
+
+        try {
+        const res = await fetch("http://localhost:3000/api/auth/dashboard", {
+            method: "GET",
+            headers: {
+                "Authorization": "Bearer " + token
+            }
+        });
+
+        if (!res.ok) {
+            localStorage.removeItem("access_token");
+            window.location.href = "/login.html";
+            return;
+        }
+
+        const data = await res.json();
+        if (walletAddress) {
+                document.getElementById("user-pseudo").textContent = walletAddress;
+        } else {
+                document.getElementById("user-pseudo").textContent = data.pseudo;
+        }
+
+        } catch (err) {
+           console.error("Erreur profil :", err);
+           window.location.href = "/login.html";
+        }
+     }
+
+     loadUserProfile();
+  </script>
+
+
 </body>
 </html>
+
