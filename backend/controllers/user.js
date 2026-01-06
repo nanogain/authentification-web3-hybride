@@ -124,3 +124,28 @@ exports.web3Login = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.web3Liaison = async (req, res) => {
+    try {
+        const { email, password, walletAddress } = req.body;
+        const normalizedAddress = walletAddress.toLowerCase();
+        let user = await User.findOne({ walletAddress: normalizedAddress });
+
+        if(!user){
+                return res.status(404).json({message: 'Aucune adresse trouvé'})
+        }
+        else{
+                const message = `Connexion`;
+                const hash = await bcrypt.hash(password, 10);
+                user.email = email;
+                user.password = hash;
+                await user.save();
+                return res.status(200).json({ message: `l adresse a été lié à ${user.email}` });
+        }
+
+    } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+
+};
+
