@@ -11,6 +11,17 @@
   <p>Vous êtes connecté !</p>
 
   <button id="logoutBtn">Déconnexion</button>
+          <form id="signupForm" >
+                        <h1>Lier une adresse email : </h1>
+                        <div>adresse email : </div>
+                        <input name="email" type="email"/>
+                        <div>mot de passe : </div>
+                        <input name="password" type="password"/>
+
+                        <button type="submit">Lier</button>
+
+          </form>
+  <div id="message"></div>
 
   <script>
     document.getElementById("logoutBtn").addEventListener("click", () => {
@@ -60,7 +71,37 @@
 
      loadUserProfile();
   </script>
+  <script>
+    document.getElementById("signupForm").addEventListener("submit", (e) => {
+        e.preventDefault();
+        liaison();
+    });
 
+    async function liaison() {
+        const email = document.querySelector("[name=email]").value;
+        const password = document.querySelector("[name=password]").value;
+        const walletAddress = localStorage.getItem("walletAddress");
+
+        const resp = await fetch("http://localhost:3000/api/auth/web3/liaison", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ email, password, walletAddress }),
+        });
+        if (resp.ok) {
+               const data = await resp.json();
+               showMessage( data.message, "success");
+
+        }
+
+    }
+
+    function showMessage(msg, type) {
+                    const div = document.getElementById("message");
+                    div.textContent = msg;
+                    div.className = type;
+    }
+
+  </script>
 
 </body>
 </html>
